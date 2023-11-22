@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+    <title>Cosmic crush</title>
+</head>
+<body>
+
+    <script type="text/javascript">
+        var config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+    
+        var game = new Phaser.Game(config);
+    
+        function preload() {
+            this.load.image('sky', './src/sky.png');
+            this.load.image('cuadrado', './src/cuadrado.png');
+            this.load.image('hexagono', './src/hexagono.png');
+            this.load.image('luna', './src/luna.png');
+            this.load.image('rombo', './src/rombo.png');
+        }
+    
+        const filasTablero = 8;
+        const columnasTablero = 8;
+        let tablero;
+        const tamañoPieza = 50;
+        const bordeColor = 0xffffff;
+    
+        function create() {
+            this.add.image(400, 300, 'sky');
+             // Agrega un gráfico de línea para simular un borde alrededor del tablero
+            const bordeTablero = this.add.graphics();
+            bordeTablero.lineStyle(2, bordeColor);
+
+            const offsetX = 10; // Espacio entre el borde y el lado izquierdo
+            const offsetY = (this.sys.game.config.height - filasTablero * tamañoPieza) / 2;
+
+            bordeTablero.strokeRect(offsetX, offsetY, columnasTablero * tamañoPieza, filasTablero * tamañoPieza);
+            bordeTablero.setDepth(1); // Establece el depth del borde
+
+
+            tablero = crearTablero();
+            const contextoActual = this;
+            crearPiezasIniciales(contextoActual);
+        }
+
+    
+        // --- Tablero ---
+        function crearTablero() {
+            const tablero = [];
+    
+            for(let fila = 0; fila < filasTablero; fila++) {
+                const arregloFilas = [];
+                for(let col = 0; col < columnasTablero; col++) {
+                    const pieza = crearPiezaAleatoria();
+                    arregloFilas.push(pieza);
+                }
+                tablero.push(arregloFilas);
+            }
+    
+            return tablero;
+        }
+    
+        // --- Piezas ---
+    
+        function crearPiezaAleatoria() {
+            const tiposPieza = ['cuadrado', 'hexagono', 'luna', 'rombo'];
+            const tipoAleatorio = Phaser.Math.RND.pick(tiposPieza);
+            return {
+                type: tipoAleatorio,
+            };
+        }
+    
+        function crearPiezasIniciales(contexto) {
+            const espacioEntrePiezasYBorde = 5; // Puedes ajustar este valor según sea necesario
+            const espacioTotalEnX = espacioEntrePiezasYBorde * 2; // Espacio en ambos lados
+            const espacioTotalEnY = espacioEntrePiezasYBorde * 2; // Espacio en ambos lados
+
+            const offsetX = 5 + espacioEntrePiezasYBorde; // Espacio entre el borde y el lado izquierdo
+            const offsetY = (contexto.sys.game.config.height - espacioTotalEnY - filasTablero * tamañoPieza) / 2;
+
+
+            for(let fila = 0; fila < filasTablero; fila++) {
+                for(let col = 0; col < columnasTablero; col++) {
+                    const x = col * tamañoPieza + offsetX + espacioEntrePiezasYBorde;
+                    const y = fila * tamañoPieza + offsetY + espacioEntrePiezasYBorde;
+    
+                    const pieza = tablero[fila][col];
+                    const clavePieza = pieza.type;
+                    const spritePieza = contexto.add.sprite(x, y, clavePieza).setScale(0.5);
+    
+                    spritePieza.setOrigin(0, 0);
+                    spritePieza.setDepth(0);
+                    }
+                }
+            }
+    
+        function update() {
+    
+        }
+    </script>
+    
+</body>
+</html>
